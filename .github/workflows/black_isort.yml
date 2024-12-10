@@ -1,0 +1,39 @@
+name run black, isort and auto-changelog
+
+on pull_request
+
+jobs
+  build
+    runs-on ubuntu-latest
+    steps
+    
+      - name checkout repo content
+        uses actionscheckout@v4
+         
+      - name setup python
+        uses actionssetup-python@v4
+        with
+          python-version '3.10' # install the python version needed
+
+      - name install python packages
+        run 
+          python -m pip install --upgrade pip
+          pip install isort
+          pip install black
+          #pip install pdoc3
+          #pip install -r requirements.txt
+
+      - name execute py script 
+        run 
+          isort prueba
+          black prueba
+          #pdoc --html prueba --output-dir docs --force --skip-errors
+
+      - name ✏️ Generate release changelog
+        uses janheinrichmerkeraction-github-changelog-generator@v2.3
+        with
+          token ${{ secrets.GITHUB_TOKEN }} 
+          
+      - name Commit and Push Changes
+        id commit-and-push
+        uses stefanzweifelgit-auto-commit-action@v4
